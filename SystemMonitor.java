@@ -14,6 +14,12 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -52,16 +58,17 @@ public class SystemMonitor extends Application
         
         group.getChildren().add( tabPane );
         
-        Service<CPU> cpuService = new Service<CPU>()
+        final Service<Integer> cpuService = new Service<Integer>()
         {
-            Task<CPU> task = null;
-            public Task<CPU> createTask()
+            Task<Integer> task = null;
+            public Task<Integer> createTask()
             {
-                Task<CPU> task = new Task<CPU>()
+                Task<Integer> task = new Task<Integer>()
                 {
-                    public CPU call()
+                    public Integer call()
                     {
-                        return null;
+                        updateCPUList();
+                        return 1;
                     }
                 };
                 
@@ -69,22 +76,60 @@ public class SystemMonitor extends Application
             }
         };
         
-        Service<Process> processService = new Service<Process>()
+        cpuService.setOnSucceeded( new EventHandler<WorkerStateEvent>()
         {
-            Task<Process> task = null;
-            public Task<Process> createTask()
+            public void handle( WorkerStateEvent event )
             {
-                Task<Process> task = new Task<Process>()
+                cpuService.reset();
+            }
+        } );
+        
+        final Service<Integer> processService = new Service<Integer>()
+        {
+            Task<Integer> task = null;
+            public Task<Integer> createTask()
+            {
+                Task<Integer> task = new Task<Integer>()
                 {
-                    public Process call()
+                    public Integer call()
                     {
-                        return null;
+                        updateProcessList();
+                        return 1;
                     }
                 };
                 
                 return task;
             }
         };
+        
+        processService.setOnSucceeded( new EventHandler<WorkerStateEvent>()
+        {
+            public void handle( WorkerStateEvent event )
+            {
+                processService.reset();
+            }
+        } );
+        
+        Timeline timer = new Timeline( new KeyFrame( Duration.seconds( 5 ), new EventHandler<ActionEvent>()
+        {
+            public void handle( ActionEvent event )
+            {
+                if( ! cpuService.isRunning() )
+                {
+                    System.out.println( "update cpus" );
+                    cpuService.start();
+                }
+                
+                if( ! processService.isRunning() )
+                {
+                    System.out.println( "update processes" );
+                    processService.start();
+                }
+            }
+        } ) );
+        
+        timer.setCycleCount( Timeline.INDEFINITE );
+        timer.play();
         
         stage.setScene( scene );
         stage.setTitle( "SystemMonitor" );
@@ -197,6 +242,7 @@ public class SystemMonitor extends Application
     
     private void updateCPUList()
     {
+        cpuList.clear();
         File statFile = new File( file.getAbsoluteFile() + "/stat" );
         String fileText = readProcFile( statFile );
         String[] fileLines = fileText.split( "\n" );
@@ -211,6 +257,7 @@ public class SystemMonitor extends Application
     
     private void updateProcessList()
     {
+        processList.clear();
         File tempFile = null;
         File statusFile = null;
         
