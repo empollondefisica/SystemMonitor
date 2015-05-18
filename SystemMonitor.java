@@ -1,12 +1,17 @@
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Menu;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -20,6 +25,7 @@ import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
+import javafx.beans.property.SimpleDoubleProperty;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -32,6 +38,8 @@ public class SystemMonitor extends Application
     ObservableList<CPU> cpuList = null;
     File file = null;
     
+    SimpleStringProperty interval = null;
+    
     public static void main( String[] args )
     {
         Application.launch( args );
@@ -42,21 +50,42 @@ public class SystemMonitor extends Application
         file = new File( "/proc" );
         processList = FXCollections.observableArrayList();
         cpuList = FXCollections.observableArrayList();
+        
+        interval = new SimpleStringProperty();
+        
         updateCPUList();
         updateProcessList();
         
+        interval.setValue( "" + ( processList.size() + cpuList.size() ) );
+        
         Group group = new Group();
-        Scene scene = new Scene( group, 600, 400 );
+        Scene scene = new Scene( group, 640, 480 );
+        BorderPane borderPane = new BorderPane();
         TabPane tabPane = new TabPane();
         
+        MenuBar menuBar = new MenuBar();
+        Menu menu = new Menu( "Menu" );
+        Menu procCount = new Menu();
+        MenuItem menuItem = new MenuItem( "Exit" );
+        
         tabPane.prefWidthProperty().bind( scene.widthProperty() );
-        tabPane.prefHeightProperty().bind( scene.heightProperty() );
+        tabPane.prefHeightProperty().bind( scene.heightProperty().subtract( menuBar.heightProperty() ) );
         tabPane.setTabClosingPolicy( TabPane.TabClosingPolicy.UNAVAILABLE );
         
         tabPane.getTabs().add( buildProcessTab() );
         tabPane.getTabs().add( buildCPUTab() );
         
-        group.getChildren().add( tabPane );
+        menuBar.getMenus().add( menu );
+        menuBar.getMenus().add( procCount );
+        
+        menu.getItems().add( menuItem );
+        
+        procCount.textProperty().bind( interval );
+        
+        borderPane.setTop( menuBar );
+        borderPane.setCenter( tabPane );
+        
+        group.getChildren().add( borderPane );
         
         final Service<Integer> cpuService = new Service<Integer>()
         {
@@ -71,7 +100,6 @@ public class SystemMonitor extends Application
                         return 1;
                     }
                 };
-                
                 return task;
             }
         };
@@ -97,7 +125,6 @@ public class SystemMonitor extends Application
                         return 1;
                     }
                 };
-                
                 return task;
             }
         };
@@ -110,23 +137,40 @@ public class SystemMonitor extends Application
             }
         } );
         
-        Timeline timer = new Timeline( new KeyFrame( Duration.seconds( 5 ), new EventHandler<ActionEvent>()
+        Timeline timer = new Timeline(
+            new KeyFrame( Duration.seconds( 1 ), new EventHandler<ActionEvent>()
         {
             public void handle( ActionEvent event )
             {
                 if( ! cpuService.isRunning() )
                 {
-                    System.out.println( "update cpus" );
                     cpuService.start();
                 }
                 
                 if( ! processService.isRunning() )
                 {
-                    System.out.println( "update processes" );
                     processService.start();
                 }
+                
+                interval.setValue( "" + ( processList.size() + cpuList.size() ) );
             }
         } ) );
+        
+        stage.setOnCloseRequest( new EventHandler<WindowEvent>()
+        {
+            public void handle( WindowEvent windowEvent )
+            {
+                if( cpuService.isRunning() )
+                {
+                    System.out.println( "cpuService is running" );
+                }
+                
+                if( processService.isRunning() )
+                {
+                    System.out.println( "processService is running" );
+                }
+            }
+        } );
         
         timer.setCycleCount( Timeline.INDEFINITE );
         timer.play();
