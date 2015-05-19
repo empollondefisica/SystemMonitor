@@ -2,6 +2,7 @@
 import javafx.scene.control.TableColumn;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class Process
 {    
@@ -21,9 +22,10 @@ public class Process
     private SimpleIntegerProperty VmLibrarySize      = null;
     private SimpleIntegerProperty VmPageTableEntries = null;
     private SimpleIntegerProperty Threads            = null;
+    private SimpleBooleanProperty Modified           = null;
     
     
-    public Process( String fileText )
+    public Process()
     {
         Name               = new SimpleStringProperty();
         State              = new SimpleStringProperty();
@@ -41,36 +43,44 @@ public class Process
         VmLibrarySize      = new SimpleIntegerProperty();
         VmPageTableEntries = new SimpleIntegerProperty();
         Threads            = new SimpleIntegerProperty();
-        
-        String[] nameValues = fileText.split( "\n" );
-        for( String nameValue : nameValues )
-        {
-            String[] tokens = nameValue.split( "\\s+" );
-            if( tokens.length > 1 )
-            {
-            
-                switch( tokens[0] )
-                {
-                case "Name:":    Name.setValue( tokens[1] ); break;
-                case "State:":   State.setValue( tokens[1] ); break;
-                case "Tgid:":    ThreadGroupID.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "Pid:":     ProcessID.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "PPid:":    ParentPID.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "FDSize:":  FileDescriptors.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmPeak:":  VmPeak.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmSize:":  VmSize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmHWM:":   VmHighWaterMark.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmRSS:":   VmResidentSetSize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmData:":  VmDataSize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmStk:":   VmStackSize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmExe:":   VmExecutableSize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmLib:":   VmLibrarySize.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "VmPTE:":   VmPageTableEntries.setValue( Integer.parseInt( tokens[1] ) ); break;
-                case "Threads:": Threads.setValue( Integer.parseInt( tokens[1] ) ); break;
-                default: break;
-                }
-            }
-        }
+        Modified           = new SimpleBooleanProperty();
+    }
+    
+    public void update(
+        String name,
+        String state,
+        int tgid,
+        int pid,
+        int ppid,
+        int fdsize,
+        int vmpeak,
+        int vmsize,
+        int vmhwm,
+        int vmrss,
+        int vmdata,
+        int vmstk,
+        int vmexe,
+        int vmlib,
+        int vmpte,
+        int threads )
+    {
+        Name.setValue( name );
+        State.setValue( state );
+        ThreadGroupID.setValue( tgid );
+        ProcessID.setValue( pid );
+        ParentPID.setValue( ppid );
+        FileDescriptors.setValue( fdsize );
+        VmPeak.setValue( vmpeak );
+        VmSize.setValue( vmsize );
+        VmHighWaterMark.setValue( vmhwm );
+        VmResidentSetSize.setValue( vmrss );
+        VmDataSize.setValue( vmdata );
+        VmStackSize.setValue( vmstk );
+        VmExecutableSize.setValue( vmexe );
+        VmLibrarySize.setValue( vmlib );
+        VmPageTableEntries.setValue( vmpte );
+        Threads.setValue( threads );
+        Modified.setValue( true );
     }
     
     public String getName() { return Name.getValue(); }
@@ -105,24 +115,79 @@ public class Process
     
     public int getThreads() { return Threads.getValue(); }
     
+    public boolean getModified() { return Modified.getValue(); }
+    
+    
+    public void setName( String name ) { Name.setValue( name ); }
+    
+    public void setState( String state ) { State.setValue( state ); }
+    
+    public void setThreadGroupID( int tgid ) { ThreadGroupID.setValue( tgid ); }
+    
+    public void setProcessID( int pid ) { ProcessID.setValue( pid ); }
+    
+    public void setParentPID( int ppid ) { ParentPID.setValue( ppid );  }
+    
+    public void setFileDescriptors( int fdsize ) { FileDescriptors.setValue( fdsize ); }
+    
+    public void setVmPeak( int vmpeak ) { VmPeak.setValue( vmpeak ); }
+    
+    public void setVmSize( int vmsize ) { VmSize.setValue( vmsize ); }
+    
+    public void setVmHighWaterMark( int vmhwm ) { VmHighWaterMark.setValue( vmhwm ); }
+    
+    public void setVmResidentSetSize( int vmrss ) { VmResidentSetSize.setValue( vmrss ); }
+    
+    public void setVmDataSize( int vmdata ) { VmDataSize.setValue( vmdata ); }
+    
+    public void setVmStackSize( int vmstack ) { VmStackSize.setValue( vmstack ); }
+    
+    public void setVmExecutableSize( int vmexe ) { VmExecutableSize.setValue( vmexe ); }
+    
+    public void setVmLibrarySize( int vmlib ) { VmLibrarySize.setValue( vmlib ); }
+    
+    public void setVmPageTableEntries( int vmpte ) { VmPageTableEntries.setValue( vmpte ); }
+    
+    public void setThreads( int threads ) { Threads.setValue( threads ); }
+    
+    public void setModified( boolean modified ) { Modified.setValue( modified ); }
+    
+    
+    public boolean equals( Object object )
+    {
+        if( object == null )
+        {
+            return false;
+        }
+        else if( !( object instanceof Process ) )
+        {
+            return false;
+        }
+        else
+        {
+            Process other = (Process)object;
+            return this.getProcessID() == other.getProcessID();
+        }
+    }
+    
     public String toString()
     {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append( "Name: " + Name.getValue() + "\n" );
-        strBuilder.append( "State: " + State.getValue() + "\n" );
-        strBuilder.append( "Tgid: " + ThreadGroupID.getValue() + "\n" );
-        strBuilder.append( "PID: " + ProcessID.getValue() + "\n" );
-        strBuilder.append( "FDSize: " + FileDescriptors.getValue() + "\n" );
-        strBuilder.append( "VmPeak: " + VmPeak.getValue() + "\n" );
-        strBuilder.append( "VmSize: " + VmSize.getValue() + "\n" );
-        strBuilder.append( "VmHWM: " + VmHighWaterMark.getValue() + "\n" );
-        strBuilder.append( "VmRSS: " + VmResidentSetSize.getValue() + "\n" );
-        strBuilder.append( "VmData: " + VmDataSize.getValue() + "\n" );
-        strBuilder.append( "VmStk: " + VmStackSize.getValue() + "\n" );
-        strBuilder.append( "VmExe: " + VmExecutableSize.getValue() + "\n" );
-        strBuilder.append( "VmLib: " + VmLibrarySize.getValue() + "\n" );
-        strBuilder.append( "VmPTE: " + VmPageTableEntries.getValue() + "\n" );
-        strBuilder.append( "Threads: " + Threads.getValue() + "\n" );
+        strBuilder.append( Name.getValue() + " " );
+        strBuilder.append( State.getValue() + " " );
+        strBuilder.append( ThreadGroupID.getValue() + " " );
+        strBuilder.append( ProcessID.getValue() + " " );
+        strBuilder.append( FileDescriptors.getValue() + " " );
+        strBuilder.append( VmPeak.getValue() + " " );
+        strBuilder.append( VmSize.getValue() + " " );
+        strBuilder.append( VmHighWaterMark.getValue() + " " );
+        strBuilder.append( VmResidentSetSize.getValue() + " " );
+        strBuilder.append( VmDataSize.getValue() + " " );
+        strBuilder.append( VmStackSize.getValue() + " " );
+        strBuilder.append( VmExecutableSize.getValue() + " " );
+        strBuilder.append( VmLibrarySize.getValue() + " " );
+        strBuilder.append( VmPageTableEntries.getValue() + " " );
+        strBuilder.append( Threads.getValue() );
         return strBuilder.toString();
     }
 }

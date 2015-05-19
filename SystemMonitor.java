@@ -34,7 +34,8 @@ import java.io.IOException;
 
 public class SystemMonitor extends Application
 {
-    ObservableList<Process> processList = null;
+    Processes updateProcesses = null;
+    Processes processes = null;
     ObservableList<CPU> cpuList = null;
     File file = null;
     
@@ -48,7 +49,8 @@ public class SystemMonitor extends Application
     public void start( Stage stage )
     {
         file = new File( "/proc" );
-        processList = FXCollections.observableArrayList();
+        updateProcesses = new Processes();
+        processes = new Processes();
         cpuList = FXCollections.observableArrayList();
         
         interval = new SimpleStringProperty();
@@ -56,7 +58,7 @@ public class SystemMonitor extends Application
         updateCPUList();
         updateProcessList();
         
-        interval.setValue( "" + ( processList.size() + cpuList.size() ) );
+        interval.setValue( "" + ( processes.count() + cpuList.size() ) );
         
         Group group = new Group();
         Scene scene = new Scene( group, 640, 480 );
@@ -138,7 +140,7 @@ public class SystemMonitor extends Application
         } );
         
         Timeline timer = new Timeline(
-            new KeyFrame( Duration.seconds( 1 ), new EventHandler<ActionEvent>()
+            new KeyFrame( Duration.seconds( 10 ), new EventHandler<ActionEvent>()
         {
             public void handle( ActionEvent event )
             {
@@ -152,7 +154,7 @@ public class SystemMonitor extends Application
                     processService.start();
                 }
                 
-                interval.setValue( "" + ( processList.size() + cpuList.size() ) );
+                interval.setValue( "" + ( processes.count() + cpuList.size() ) );
             }
         } ) );
         
@@ -227,8 +229,8 @@ public class SystemMonitor extends Application
         Tab processTab = new Tab( "Processes" );
         TableView<Process> tableView = new TableView<Process>();
         
-        TableColumn<Process, String> nameColumn = new TableColumn<Process, String>( "Name" );
-        TableColumn<Process, String> stateColumn = new TableColumn<Process, String>( "State" );
+        TableColumn<Process, String>  nameColumn = new TableColumn<Process, String>( "Name" );
+        TableColumn<Process, String>  stateColumn = new TableColumn<Process, String>( "State" );
         TableColumn<Process, Integer> tgidColumn = new TableColumn<Process, Integer>( "TGID" );
         TableColumn<Process, Integer> pidColumn = new TableColumn<Process, Integer>( "PID" );
         TableColumn<Process, Integer> ppidColumn = new TableColumn<Process, Integer>( "PPID" );
@@ -267,6 +269,7 @@ public class SystemMonitor extends Application
         tableView.getColumns().add( stateColumn );
         tableView.getColumns().add( tgidColumn );
         tableView.getColumns().add( fdSizeColumn );
+        tableView.getColumns().add( peakColumn );
         tableView.getColumns().add( sizeColumn );
         tableView.getColumns().add( hwmColumn );
         tableView.getColumns().add( rssColumn );
@@ -277,7 +280,7 @@ public class SystemMonitor extends Application
         tableView.getColumns().add( pteColumn );
         tableView.getColumns().add( threadsColumn );
         
-        tableView.setItems( processList );
+        tableView.setItems( processes.getCollection() );
         
         processTab.setContent( tableView );
         
@@ -301,9 +304,12 @@ public class SystemMonitor extends Application
     
     private void updateProcessList()
     {
-        processList.clear();
+        updateProcesses.clear();
         File tempFile = null;
         File statusFile = null;
+        Process tempProcess = null;
+        int index = -1;
+        ObservableList<Process> removeList = FXCollections.observableArrayList();
         
         for( String name : file.list() )
         {
@@ -311,10 +317,66 @@ public class SystemMonitor extends Application
             {
                 tempFile = new File( file.getAbsoluteFile() + "/" + name );
                 statusFile = new File( tempFile.getAbsoluteFile() + "/status" );
-                Process proc = new Process( readProcFile( statusFile ) );
-                processList.add( proc );
+                updateProcesses.add( readProcFile( statusFile ) );
             }
         }
+        
+        System.out.println( "checking " + updateProcesses.count() + " processes" );
+        
+        for( Process process : updateProcesses.getCollection() )
+        {
+            index = processes.find( process );
+            
+            if( index != -1 )
+            {
+                tempProcess = processes.getCollection().get( index );
+                tempProcess.update(
+                    process.getName(),
+                    process.getState(),
+                    process.getThreadGroupID(),
+                    process.getProcessID(),
+                    process.getParentPID(),
+                    process.getFileDescriptors(),
+                    process.getVmPeak(),
+                    process.getVmSize(),
+                    process.getVmHighWaterMark(),
+                    process.getVmResidentSetSize(),
+                    process.getVmDataSize(),
+                    process.getVmStackSize(),
+                    process.getVmExecutableSize(),
+                    process.getVmLibrarySize(),
+                    process.getVmPageTableEntries(),
+                    process.getThreads() );
+            }
+            else
+            {
+                processes.add( process );
+            }
+        }
+        
+        for( Process process : processes.getCollection() )
+        {
+            index = updateProcesses.find( process );
+            if( index == -1 )
+            {
+                process.setModified( false );
+            }
+        }
+        
+        for( Process process : processes.getCollection() )
+        {
+            if( !process.getModified() )
+            {
+                removeList.add( process );
+            }
+            else
+            {
+                process.setModified( false );
+            }
+        }
+        
+        System.out.println( "removing " + removeList.size() + " processes" );
+        processes.getCollection().removeAll( removeList );
     }
     
     private String readProcFile( File procFile )
