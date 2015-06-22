@@ -2,76 +2,133 @@
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 
 public class CPU
 {
-    SimpleStringProperty  Name = null;
-    SimpleIntegerProperty User = null;
-    SimpleIntegerProperty Nice = null;
-    SimpleIntegerProperty System = null;
-    SimpleIntegerProperty Idle = null;
-    SimpleIntegerProperty IOWait = null;
-    SimpleIntegerProperty Interrupts = null;
-    SimpleIntegerProperty SoftInterrupts = null;
-    SimpleIntegerProperty Steal = null;
+    SimpleStringProperty  Name              = null;
+    SimpleLongProperty User              = null;
+    SimpleLongProperty Nice              = null;
+    SimpleLongProperty System            = null;
+    SimpleLongProperty Idle              = null;
+    SimpleLongProperty IOWait            = null;
+    SimpleLongProperty Interrupts        = null;
+    SimpleLongProperty SoftInterrupts    = null;
+    SimpleLongProperty Steal             = null;
+    SimpleBooleanProperty Modified          = null;
     
-    public CPU( String fileText )
+    public CPU()
     {
-        Name = new SimpleStringProperty();
-        User = new SimpleIntegerProperty();
-        Nice = new SimpleIntegerProperty();
-        System = new SimpleIntegerProperty();
-        Idle = new SimpleIntegerProperty();
-        IOWait = new SimpleIntegerProperty();
-        Interrupts = new SimpleIntegerProperty();
-        SoftInterrupts = new SimpleIntegerProperty();
-        Steal = new SimpleIntegerProperty();
-        
-        String[] tokens = fileText.split( "\\s+" );
-        
-        Name.setValue( tokens[0] );
-        User.setValue( Integer.parseInt( tokens[1] ) );
-        Nice.setValue( Integer.parseInt( tokens[2] ) );
-        System.setValue( Integer.parseInt( tokens[3] ) );
-        Idle.setValue( Integer.parseInt( tokens[4] ) );
-        IOWait.setValue( Integer.parseInt( tokens[5] ) );
-        Interrupts.setValue( Integer.parseInt( tokens[6] ) );
-        SoftInterrupts.setValue( Integer.parseInt( tokens[7] ) );
-        Steal.setValue( Integer.parseInt( tokens[8] ) );
+        Name            = new SimpleStringProperty();
+        User            = new SimpleLongProperty();
+        Nice            = new SimpleLongProperty();
+        System          = new SimpleLongProperty();
+        Idle            = new SimpleLongProperty();
+        IOWait          = new SimpleLongProperty();
+        Interrupts      = new SimpleLongProperty();
+        SoftInterrupts  = new SimpleLongProperty();
+        Steal           = new SimpleLongProperty();
+        Modified        = new SimpleBooleanProperty();
     }
+    
+    public void update(
+        String name,
+        long user,
+        long nice,
+        long system,
+        long idle,
+        long iowait,
+        long interrupts,
+        long softinterrupts,
+        long steal )
+    {
+        Name.setValue( name );
+        User.setValue( user );
+        Nice.setValue( nice );
+        System.setValue( system );
+        Idle.setValue( idle );
+        IOWait.setValue( iowait );
+        Interrupts.setValue( interrupts );
+        SoftInterrupts.setValue( softinterrupts );
+        Steal.setValue( steal );
+        Modified.setValue( true );
+    }
+    
     
     public String getName() { return Name.getValue(); }
 
-    public Integer getUser() { return User.getValue(); }
+    public Long getUser() { return User.getValue(); }
     
-    public Integer getNice() { return Nice.getValue(); }
+    public Long getNice() { return Nice.getValue(); }
     
-    public Integer getSystem() { return System.getValue(); }
+    public Long getSystem() { return System.getValue(); }
     
-    public Integer getIdle() { return Idle.getValue(); }
+    public Long getIdle() { return Idle.getValue(); }
     
-    public Integer getIOWait() { return IOWait.getValue(); }
+    public Long getIOWait() { return IOWait.getValue(); }
     
-    public Integer getInterrupts() { return Interrupts.getValue(); }
+    public Long getInterrupts() { return Interrupts.getValue(); }
     
-    public Integer getSoftInterrupts() { return SoftInterrupts.getValue(); }
+    public Long getSoftInterrupts() { return SoftInterrupts.getValue(); }
     
-    public Integer getSteal() { return Steal.getValue(); }
+    public Long getSteal() { return Steal.getValue(); }
+    
+    public boolean getModified() { return Modified.getValue(); }
+    
+    
+    public void setName( String name ) { Name.setValue( name ); }
+
+    public void setUser( long user ) { User.setValue( user ); }
+    
+    public void setNice( long nice ) { Nice.setValue( nice ); }
+    
+    public void setSystem( long system ) { System.setValue( system ); }
+    
+    public void setIdle( long idle ) { Idle.setValue( idle ); }
+    
+    public void setIOWait( long iowait ) { IOWait.setValue( iowait ); }
+    
+    public void setInterrupts( long interrupts ) { Interrupts.setValue( interrupts ); }
+    
+    public void setSoftInterrupts( long softinterrupts ) { SoftInterrupts.setValue( softinterrupts ); }
+    
+    public void setSteal( long steal ) { Steal.setValue( steal ); }
+    
+    public void setModified( boolean modified ) { Modified.setValue( modified ); }
+    
+    
+    public boolean equals( Object object )
+    {
+        if( object == null )
+        {
+            return false;
+        }
+        else if( !( object instanceof CPU ) )
+        {
+            return false;
+        }
+        else
+        {
+            CPU other = (CPU)object;
+            return this.getName().equalsIgnoreCase( other.getName() );
+        }
+    }
     
     public String toString()
     {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append( "Name: " + Name.getValue() + "\n" );
-        strBuilder.append( "User: " + User.getValue() + "\n" );
-        strBuilder.append( "Nice: " + Nice.getValue() + "\n" );
-        strBuilder.append( "System: " + System.getValue() + "\n" );
-        strBuilder.append( "Idle: " + Idle.getValue() + "\n" );
-        strBuilder.append( "IOWait: " + IOWait.getValue() + "\n" );
-        strBuilder.append( "Interrupts: " + Interrupts.getValue() + "\n" );
-        strBuilder.append( "SoftInterrupts: " + SoftInterrupts.getValue() + "\n" );
-        strBuilder.append( "Steal: " + Steal.getValue() + "\n" );
+        strBuilder.append( Name.getValue() + " " );
+        strBuilder.append( User.getValue() + " " );
+        strBuilder.append( Nice.getValue() + " " );
+        strBuilder.append( System.getValue() + " " );
+        strBuilder.append( Idle.getValue() + " " );
+        strBuilder.append( IOWait.getValue() + " " );
+        strBuilder.append( Interrupts.getValue() + " " );
+        strBuilder.append( SoftInterrupts.getValue() + " " );
+        strBuilder.append( Steal.getValue() );
+        
         return strBuilder.toString();
     }
 }
