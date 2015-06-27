@@ -4,33 +4,33 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-public class Process
+public class SystemProcess
 {
-    private SimpleLongProperty ProcessID          = null;
+    private SimpleLongProperty    ProcessID          = null;
     private SimpleStringProperty  Name               = null;
     private SimpleStringProperty  State              = null;
-    private SimpleLongProperty ParentPID          = null;
-    private SimpleLongProperty ProcessGroupID     = null;
-    private SimpleLongProperty SessionID          = null;
-    private SimpleLongProperty ThreadGroupID      = null;
-    private SimpleLongProperty MinorFaults        = null;
-    private SimpleLongProperty ChildMinorFaults   = null;
-    private SimpleLongProperty MajorFaults        = null;
-    private SimpleLongProperty ChildMajorFaults   = null;
-    private SimpleLongProperty UserTime           = null;
-    private SimpleLongProperty SystemTime         = null;
-    private SimpleLongProperty ChildUserTime      = null;
-    private SimpleLongProperty ChildSystemTime    = null;
-    private SimpleLongProperty Priority           = null;
-    private SimpleLongProperty NiceValue          = null;
-    private SimpleLongProperty NumThreads         = null;
-    private SimpleLongProperty StartTime          = null;
-    private SimpleLongProperty VirtualSize        = null;
-    private SimpleLongProperty ResidentSetSize    = null;
-    private SimpleLongProperty ProcessorNumber    = null;
+    private SimpleLongProperty    ParentPID          = null;
+    private SimpleLongProperty    ProcessGroupID     = null;
+    private SimpleLongProperty    SessionID          = null;
+    private SimpleLongProperty    ThreadGroupID      = null;
+    private SimpleLongProperty    MinorFaults        = null;
+    private SimpleLongProperty    ChildMinorFaults   = null;
+    private SimpleLongProperty    MajorFaults        = null;
+    private SimpleLongProperty    ChildMajorFaults   = null;
+    private SimpleLongProperty    UserTime           = null;
+    private SimpleLongProperty    SystemTime         = null;
+    private SimpleLongProperty    ChildUserTime      = null;
+    private SimpleLongProperty    ChildSystemTime    = null;
+    private SimpleLongProperty    Priority           = null;
+    private SimpleLongProperty    NiceValue          = null;
+    private SimpleLongProperty    NumThreads         = null;
+    private SimpleLongProperty    StartTime          = null;
+    private SimpleLongProperty    VirtualSize        = null;
+    private SimpleLongProperty    ResidentSetSize    = null;
+    private SimpleLongProperty    ProcessorNumber    = null;
     private SimpleBooleanProperty Modified           = null;
     
-    public Process()
+    public SystemProcess()
     {
         ProcessID          = new SimpleLongProperty();
         Name               = new SimpleStringProperty();
@@ -79,7 +79,7 @@ public class Process
         long start,
         long vsize,
         long rss,
-        long processor )
+        long processor)
     {
         ProcessID.setValue(processID);
         Name.setValue(name);
@@ -103,8 +103,9 @@ public class Process
         VirtualSize.setValue(vsize);
         ResidentSetSize.setValue(rss);
         ProcessorNumber.setValue(processor);
-        Modified.setValue( true );
+        Modified.setValue(true);
     }
+    
     
     public long getProcessID() { return ProcessID.getValue(); }
     
@@ -153,6 +154,7 @@ public class Process
     public boolean getModified() { return Modified.getValue(); }
     
     
+    
     public void setProcessID(long pid) { ProcessID.setValue(pid); }
     
     public void setName(String name) { Name.setValue(name); }
@@ -197,22 +199,22 @@ public class Process
     
     public void setProcessorNumber(long processor) { ProcessorNumber.setValue(processor); }
     
-    public void setModified( boolean modified ) { Modified.setValue( modified ); }
+    public void setModified(boolean modified) { Modified.setValue(modified); }
     
     
-    public boolean equals( Object object )
+    public boolean equals(Object object)
     {
-        if( object == null )
+        if(object == null)
         {
             return false;
         }
-        else if( !( object instanceof Process ) )
+        else if(!(object instanceof SystemProcess))
         {
             return false;
         }
         else
         {
-            Process other = (Process)object;
+            SystemProcess other = (SystemProcess)object;
             return this.getProcessID() == other.getProcessID();
         }
     }
@@ -220,29 +222,29 @@ public class Process
     public String toString()
     {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append( ProcessID.getValue() + " " );
-        strBuilder.append( Name.getValue() + " " );
-        strBuilder.append( State.getValue() + " " );
-        strBuilder.append( ParentPID.getValue() + " " );
-        strBuilder.append( ProcessGroupID.getValue() + " " );
-        strBuilder.append( SessionID.getValue() + " " );
-        strBuilder.append( ThreadGroupID.getValue() + " " );
-        strBuilder.append( MinorFaults.getValue() + " " );
-        strBuilder.append( ChildMinorFaults.getValue() + " " );
-        strBuilder.append( MajorFaults.getValue() + " " );
-        strBuilder.append( ChildMajorFaults.getValue() + " " );
-        strBuilder.append( UserTime.getValue() + " " );
-        strBuilder.append( SystemTime.getValue() + " " );
-        strBuilder.append( ChildUserTime.getValue() + " " );
-        strBuilder.append( ChildSystemTime.getValue() + " " );
-        strBuilder.append( Priority.getValue() + " " );
-        strBuilder.append( NiceValue.getValue() + " " );
-        strBuilder.append( NumThreads.getValue() + " " );
-        strBuilder.append( StartTime.getValue()  + " " );
-        strBuilder.append( VirtualSize.getValue()  + " " );
-        strBuilder.append( ResidentSetSize.getValue() + " " );
-        strBuilder.append( ProcessorNumber.getValue() + " " );
-        strBuilder.append( Modified.getValue() );
+        strBuilder.append(ProcessID.getValue() + " ");
+        strBuilder.append(Name.getValue() + " ");
+        strBuilder.append(State.getValue() + " ");
+        strBuilder.append(ParentPID.getValue() + " ");
+        strBuilder.append(ProcessGroupID.getValue() + " ");
+        strBuilder.append(SessionID.getValue() + " ");
+        strBuilder.append(ThreadGroupID.getValue() + " ");
+        strBuilder.append(MinorFaults.getValue() + " ");
+        strBuilder.append(ChildMinorFaults.getValue() + " ");
+        strBuilder.append(MajorFaults.getValue() + " ");
+        strBuilder.append(ChildMajorFaults.getValue() + " ");
+        strBuilder.append(UserTime.getValue() + " ");
+        strBuilder.append(SystemTime.getValue() + " ");
+        strBuilder.append(ChildUserTime.getValue() + " ");
+        strBuilder.append(ChildSystemTime.getValue() + " ");
+        strBuilder.append(Priority.getValue() + " ");
+        strBuilder.append(NiceValue.getValue() + " ");
+        strBuilder.append(NumThreads.getValue() + " ");
+        strBuilder.append(StartTime.getValue()  + " ");
+        strBuilder.append(VirtualSize.getValue()  + " ");
+        strBuilder.append(ResidentSetSize.getValue() + " ");
+        strBuilder.append(ProcessorNumber.getValue() + " ");
+        strBuilder.append(Modified.getValue());
         
         return strBuilder.toString();
     }
