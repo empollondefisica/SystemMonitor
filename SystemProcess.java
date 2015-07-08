@@ -28,8 +28,9 @@ public class SystemProcess
     private SimpleLongProperty    VirtualSize        = null;
     private SimpleLongProperty    ResidentSetSize    = null;
     private SimpleLongProperty    ProcessorNumber    = null;
+    private SimpleStringProperty  Owner              = null;
     private SimpleBooleanProperty Modified           = null;
-    
+
     public SystemProcess()
     {
         ProcessID          = new SimpleLongProperty();
@@ -54,9 +55,10 @@ public class SystemProcess
         VirtualSize        = new SimpleLongProperty();
         ResidentSetSize    = new SimpleLongProperty();
         ProcessorNumber    = new SimpleLongProperty();
+        Owner              = new SimpleStringProperty();
         Modified           = new SimpleBooleanProperty();
     }
-    
+
     public void update(
         long processID,
         String name,
@@ -79,7 +81,8 @@ public class SystemProcess
         long start,
         long vsize,
         long rss,
-        long processor)
+        long processor,
+        String owner)
     {
         ProcessID.setValue(processID);
         Name.setValue(name);
@@ -103,105 +106,110 @@ public class SystemProcess
         VirtualSize.setValue(vsize);
         ResidentSetSize.setValue(rss);
         ProcessorNumber.setValue(processor);
+        Owner.setValue(owner);
         Modified.setValue(true);
     }
-    
-    
+
+
     public long getProcessID() { return ProcessID.getValue(); }
-    
+
     public String getName() { return Name.getValue(); }
-    
+
     public String getState() { return State.getValue(); }
-    
+
     public long getParentPID() { return ParentPID.getValue(); }
-    
+
     public long getProcessGroupID() { return ProcessGroupID.getValue(); }
-    
+
     public long getSessionID() { return SessionID.getValue(); }
-    
+
     public long getThreadGroupID() { return ThreadGroupID.getValue(); }
-    
+
     public long getMinorFaults() { return MinorFaults.getValue(); }
-    
+
     public long getChildMinorFaults() { return ChildMinorFaults.getValue(); }
-    
+
     public long getMajorFaults() { return MajorFaults.getValue(); }
-    
+
     public long getChildMajorFaults() { return ChildMajorFaults.getValue(); }
-    
+
     public long getUserTime() { return UserTime.getValue(); }
-    
+
     public long getSystemTime() { return SystemTime.getValue(); }
-    
+
     public long getChildUserTime() { return ChildUserTime.getValue(); }
-    
+
     public long getChildSystemTime() { return ChildSystemTime.getValue(); }
-    
+
     public long getPriority() { return Priority.getValue(); }
-    
+
     public long getNiceValue() { return NiceValue.getValue(); }
-    
+
     public long getNumThreads() { return NumThreads.getValue(); }
-    
+
     public long getStartTime() { return StartTime.getValue(); }
-    
+
     public long getVirtualSize() { return VirtualSize.getValue(); }
-    
+
     public long getResidentSetSize() { return ResidentSetSize.getValue(); }
-    
+
     public long getProcessorNumber() { return ProcessorNumber.getValue(); }
-    
+
+    public String getOwner() { return Owner.getValue(); }
+
     public boolean getModified() { return Modified.getValue(); }
-    
-    
-    
+
+
+
     public void setProcessID(long pid) { ProcessID.setValue(pid); }
-    
+
     public void setName(String name) { Name.setValue(name); }
-    
+
     public void setState(String state) { State.setValue(state); }
-    
+
     public void setParentPID(long ppid) { ParentPID.setValue(ppid); }
-    
+
     public void setProcessGroupID(long pgid) { ProcessGroupID.setValue(pgid); }
-    
+
     public void setSessionID(long sessionID) { SessionID.setValue(sessionID); }
-    
+
     public void setThreadGroupID(long tgid) { ThreadGroupID.setValue(tgid); }
-    
+
     public void setMinorFaults(long minFaults) { MinorFaults.setValue(minFaults); }
-    
+
     public void setChildMinorFaults(long cMinFaults) { ChildMinorFaults.setValue(cMinFaults); }
-    
+
     public void setMajorFaults(long majFaults) { MajorFaults.setValue(majFaults); }
-    
+
     public void setChildMajorFaults(long cMajFaults) { ChildMajorFaults.setValue(cMajFaults); }
-    
+
     public void setUserTime(long utime) { UserTime.setValue(utime); }
-    
+
     public void setSystemTime(long stime) { SystemTime.setValue(stime); }
-    
+
     public void setChildUserTime(long cutime) { ChildUserTime.setValue(cutime); }
-    
+
     public void setChildSystemTime(long cstime) { ChildSystemTime.setValue(cstime); }
-    
+
     public void setPriority(long priority) { Priority.setValue(priority); }
-    
+
     public void setNiceValue(long nice) { NiceValue.setValue(nice); }
-    
+
     public void setNumThreads(long threads) { NumThreads.setValue(threads); }
-    
+
     public void setStartTime(long start) { StartTime.setValue(start); }
-    
+
     public void setVirtualSize(long vsize) { VirtualSize.setValue(vsize); }
-    
+
     public void setResidentSetSize(long rss) { ResidentSetSize.setValue(rss); }
-    
+
     public void setProcessorNumber(long processor) { ProcessorNumber.setValue(processor); }
-    
+
+    public void setOwner(String owner) { Owner.setValue(owner); }
+
     public void setModified(boolean modified) { Modified.setValue(modified); }
-    
-    
+
+
     public boolean equals(Object object)
     {
         if(object == null)
@@ -218,7 +226,12 @@ public class SystemProcess
             return this.getProcessID() == other.getProcessID();
         }
     }
-    
+
+    public int hashCode()
+    {
+        return 0;
+    }
+
     public String toString()
     {
         StringBuilder strBuilder = new StringBuilder();
@@ -244,8 +257,9 @@ public class SystemProcess
         strBuilder.append(VirtualSize.getValue()  + " ");
         strBuilder.append(ResidentSetSize.getValue() + " ");
         strBuilder.append(ProcessorNumber.getValue() + " ");
+        strBuilder.append(Owner.getValue() + " ");
         strBuilder.append(Modified.getValue());
-        
+
         return strBuilder.toString();
     }
 }

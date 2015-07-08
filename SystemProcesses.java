@@ -9,17 +9,17 @@ public class SystemProcesses
 {
     ObservableList<SystemProcess> Collection = null;
     TableView<SystemProcess> oTableView = null;
-    
+
     public SystemProcesses()
     {
         Collection = FXCollections.observableArrayList();
     }
-    
+
     public void add(SystemProcess process)
     {
         Collection.add(process);
     }
-    
+
     public void add(
         long processID,
         String name,
@@ -42,10 +42,11 @@ public class SystemProcesses
         long start,
         long vsize,
         long rss,
-        long processor)
+        long processor,
+        String owner)
     {
         SystemProcess process = new SystemProcess();
-        
+
         process.setProcessID(processID);
         process.setName(name);
         process.setState(state);
@@ -68,12 +69,13 @@ public class SystemProcesses
         process.setVirtualSize(vsize);
         process.setResidentSetSize(rss);
         process.setProcessorNumber(processor);
+        process.setOwner(owner);
         process.setModified(true);
-        
+
         Collection.add(process);
     }
-    
-    public void add(String fileText)
+
+    public void add(String fileText, String ownerName)
     {
         long processID = 0;
         String name = "";
@@ -96,13 +98,14 @@ public class SystemProcesses
         long start = 0;
         long vsize = 0;
         long rss = 0;
+        String owner = "";
         long processor = 0;
-        
+
         String pid = fileText.substring(0, fileText.indexOf(' '));
         name = fileText.substring(pid.length() + 2, fileText.indexOf(')'));
         fileText = fileText.substring(pid.length() + name.length() + 4, fileText.length());
         String[] tokens = fileText.split("\\s+");
-        
+
         if(tokens.length > 1)
         {
             processID   = Long.valueOf(pid);
@@ -126,47 +129,70 @@ public class SystemProcesses
             vsize       = Long.valueOf(tokens[20]);
             rss         = Long.valueOf(tokens[21]);
             processor   = Long.valueOf(tokens[36]);
+            owner       = ownerName;
         }
 
-        add(processID, name, state, ppid, pgid, sessionID, tgid, minFaults, cMinFaults, majFaults, cMajFaults, utime, stime, cutime, cstime, priority, nice, threads, start, vsize, rss, processor);
+        add(processID,
+            name,
+            state,
+            ppid,
+            pgid,
+            sessionID,
+            tgid,
+            minFaults,
+            cMinFaults,
+            majFaults,
+            cMajFaults,
+            utime,
+            stime,
+            cutime,
+            cstime,
+            priority,
+            nice,
+            threads,
+            start,
+            vsize,
+            rss,
+            processor,
+            ownerName);
     }
-    
+
     public void clear()
     {
         Collection.clear();
     }
-    
+
     public int count()
     {
         return Collection.size();
     }
-    
+
     public ObservableList<SystemProcess> getCollection()
     {
         return Collection;
     }
-    
+
     public void remove(Process process)
     {
         Collection.remove(process);
     }
-    
+
     public void remove(int index)
     {
         Collection.remove(index);
     }
-    
+
     public int find(SystemProcess process)
     {
         return Collection.indexOf(process);
     }
-    
+
     public TableView<SystemProcess> getTableView()
     {
         if(oTableView == null)
         {
             oTableView = new TableView<SystemProcess>();
-            
+
             TableColumn<SystemProcess, Long> pidColumn        = new TableColumn<SystemProcess, Long>("PID");
             TableColumn<SystemProcess, String> nameColumn     = new TableColumn<SystemProcess, String>("Name");
             TableColumn<SystemProcess, String> stateColumn    = new TableColumn<SystemProcess, String>("State");
@@ -189,7 +215,8 @@ public class SystemProcesses
             TableColumn<SystemProcess, Long> vsizeColumn      = new TableColumn<SystemProcess, Long>("Virtual Size");
             TableColumn<SystemProcess, Long> rssColumn        = new TableColumn<SystemProcess, Long>("Resident Set Size");
             TableColumn<SystemProcess, Long> processorColumn  = new TableColumn<SystemProcess, Long>("Processor Number");
-            
+            TableColumn<SystemProcess, String> ownerColumn    = new TableColumn<SystemProcess, String>("Owner");
+
             pidColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ProcessID"));
             nameColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("Name"));
             stateColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("State"));
@@ -212,7 +239,8 @@ public class SystemProcesses
             vsizeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("VirtualSize"));
             rssColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ResidentSetSize"));
             processorColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ProcessorNumber"));
-            
+            ownerColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("Owner"));
+
             oTableView.getColumns().add(pidColumn);
             oTableView.getColumns().add(nameColumn);
             oTableView.getColumns().add(stateColumn);
@@ -235,10 +263,11 @@ public class SystemProcesses
             oTableView.getColumns().add(vsizeColumn);
             oTableView.getColumns().add(rssColumn);
             oTableView.getColumns().add(processorColumn);
-            
+            oTableView.getColumns().add(ownerColumn);
+
             oTableView.setItems(Collection);
         }
-        
+
         return oTableView;
     }
 }

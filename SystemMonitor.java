@@ -36,6 +36,11 @@ import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.attribute.UserPrincipal;
+
 public class SystemMonitor extends Application
 {
     SystemProcesses updateSystemProcesses = null;
@@ -304,6 +309,8 @@ public class SystemMonitor extends Application
         int index = -1;
         ObservableList<SystemProcess> removeList = FXCollections.observableArrayList();
         String textFile;
+        Path path;
+        UserPrincipal owner;
 
         for(String name : file.list())
         {
@@ -314,7 +321,9 @@ public class SystemMonitor extends Application
                     tempFile = new File(file.getAbsoluteFile() + "/" + name);
                     statusFile = new File(tempFile.getAbsoluteFile() + "/stat");
                     textFile = readProcFile(statusFile);
-                    updateSystemProcesses.add(textFile);
+                    path = Paths.get(statusFile.getAbsoluteFile().toString());
+                    owner = Files.getOwner(path);
+                    updateSystemProcesses.add(textFile, owner.getName());
                 }
             }
             catch(IOException ioe)
@@ -352,7 +361,8 @@ public class SystemMonitor extends Application
                     process.getStartTime(),
                     process.getVirtualSize(),
                     process.getResidentSetSize(),
-                    process.getProcessorNumber());
+                    process.getProcessorNumber(),
+                    process.getOwner());
             }
             else
             {
