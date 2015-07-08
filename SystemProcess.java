@@ -229,7 +229,7 @@ public class SystemProcess
 
     public int hashCode()
     {
-        return 0;
+        return ProcessID.hashCode();
     }
 
     public String toString()
