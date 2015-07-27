@@ -223,7 +223,7 @@ public class SystemProcess
         else
         {
             SystemProcess other = (SystemProcess)object;
-            return this.getProcessID() == other.getProcessID();
+            return (this.getProcessID() == other.getProcessID() && this.getStartTime() == other.getStartTime());
         }
     }
 

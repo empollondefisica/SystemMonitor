@@ -7,32 +7,32 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class CPUs
 {
-    ObservableList<CPU> Collection = null;
-    TableView<CPU> oTableView = null;
-    
+    ObservableList<CPU> oCollection = null;
+    TableView<CPU>      oTableView  = null;
+
     public CPUs()
     {
-        Collection = FXCollections.observableArrayList();
+        oCollection = FXCollections.observableArrayList();
     }
-    
+
     public void add(CPU cpu)
     {
-        Collection.add(cpu);
+        oCollection.add(cpu);
     }
-    
+
     public void add(
         String name,
-        long user,
-        long nice,
-        long system,
-        long idle,
-        long iowait,
-        long interrupts,
-        long softinterrupts,
-        long steal)
+        long   user,
+        long   nice,
+        long   system,
+        long   idle,
+        long   iowait,
+        long   interrupts,
+        long   softinterrupts,
+        long   steal)
     {
         CPU cpu = new CPU();
-        
+
         cpu.setName(name);
         cpu.setUser(user);
         cpu.setNice(nice);
@@ -43,10 +43,10 @@ public class CPUs
         cpu.setSoftInterrupts(softinterrupts);
         cpu.setSteal(steal);
         cpu.setModified(true);
-        
-        Collection.add(cpu);
+
+        oCollection.add(cpu);
     }
-    
+
     public void add(String fileText)
     {
         String  name            = "";
@@ -58,68 +58,68 @@ public class CPUs
         long     interrupts      = 0;
         long     softinterrupts  = 0;
         long     steal           = 0;
-        
+
         String[] tokens = fileText.split("\\s+");
-        
-        name = tokens[0];
-        user = Long.valueOf(tokens[1]);
-        nice = Long.valueOf(tokens[2]);
-        system = Long.valueOf(tokens[3]);
-        idle = Long.valueOf(tokens[4]);
-        iowait = Long.valueOf(tokens[5]);
-        interrupts = Long.valueOf(tokens[6]);
+
+        name           = tokens[0];
+        user           = Long.valueOf(tokens[1]);
+        nice           = Long.valueOf(tokens[2]);
+        system         = Long.valueOf(tokens[3]);
+        idle           = Long.valueOf(tokens[4]);
+        iowait         = Long.valueOf(tokens[5]);
+        interrupts     = Long.valueOf(tokens[6]);
         softinterrupts = Long.valueOf(tokens[7]);
-        steal = Long.valueOf(tokens[8]);
-        
+        steal          = Long.valueOf(tokens[8]);
+
         add(name, user, nice, system, idle, iowait, interrupts, softinterrupts, steal);
     }
-    
+
     public void clear()
     {
-        Collection.clear();
+        oCollection.clear();
     }
-    
+
     public int count()
     {
-        return Collection.size();
+        return oCollection.size();
     }
-    
+
     public ObservableList<CPU> getCollection()
     {
-        return Collection;
+        return oCollection;
     }
-    
+
     public void remove(CPU cpu)
     {
-        Collection.remove(cpu);
+        oCollection.remove(cpu);
     }
-    
+
     public void remove(int index)
     {
-        Collection.remove(index);
+        oCollection.remove(index);
     }
-    
+
     public int find(CPU cpu)
     {
-        return Collection.indexOf(cpu);
+        return oCollection.indexOf(cpu);
     }
-    
+
     public TableView<CPU> getTableView()
     {
         if(oTableView == null)
         {
             oTableView = new TableView<CPU>();
-            
-            TableColumn<CPU, String> nameColumn = new TableColumn<CPU, String>("Name");
-            TableColumn<CPU, Long> userColumn = new TableColumn<CPU, Long>("User");
-            TableColumn<CPU, Long> niceColumn = new TableColumn<CPU, Long>("Nice");
-            TableColumn<CPU, Long> systemColumn = new TableColumn<CPU, Long>("System");
-            TableColumn<CPU, Long> idleColumn = new TableColumn<CPU, Long>("Idle");
-            TableColumn<CPU, Long> iowaitColumn = new TableColumn<CPU, Long>("IOWait");
-            TableColumn<CPU, Long> interruptColumn = new TableColumn<CPU, Long>("Interrupts");
-            TableColumn<CPU, Long> softInterruptColumn = new TableColumn<CPU, Long>("SoftInterrupts");
-            TableColumn<CPU, Long> stealColumn = new TableColumn<CPU, Long>("Steal");
-            
+
+            TableColumn<CPU, String> nameColumn          = new TableColumn<CPU, String>("Name");
+            TableColumn<CPU, Long>   userColumn          = new TableColumn<CPU, Long>("User");
+            TableColumn<CPU, Long>   niceColumn          = new TableColumn<CPU, Long>("Nice");
+            TableColumn<CPU, Long>   systemColumn        = new TableColumn<CPU, Long>("System");
+            TableColumn<CPU, Long>   idleColumn          = new TableColumn<CPU, Long>("Idle");
+            TableColumn<CPU, Long>   iowaitColumn        = new TableColumn<CPU, Long>("IOWait");
+            TableColumn<CPU, Long>   interruptColumn     = new TableColumn<CPU, Long>("Interrupts");
+            TableColumn<CPU, Long>   softInterruptColumn = new TableColumn<CPU, Long>("SoftInterrupts");
+            TableColumn<CPU, Long>   stealColumn         = new TableColumn<CPU, Long>("Steal");
+
             nameColumn.setCellValueFactory(new PropertyValueFactory<CPU, String>("Name"));
             userColumn.setCellValueFactory(new PropertyValueFactory<CPU, Long>("User"));
             niceColumn.setCellValueFactory(new PropertyValueFactory<CPU, Long>("Nice"));
@@ -129,7 +129,7 @@ public class CPUs
             interruptColumn.setCellValueFactory(new PropertyValueFactory<CPU, Long>("Interrupts"));
             softInterruptColumn.setCellValueFactory(new PropertyValueFactory<CPU, Long>("SoftInterrupts"));
             stealColumn.setCellValueFactory(new PropertyValueFactory<CPU, Long>("Steal"));
-            
+
             oTableView.getColumns().add(nameColumn);
             oTableView.getColumns().add(userColumn);
             oTableView.getColumns().add(niceColumn);
@@ -139,10 +139,10 @@ public class CPUs
             oTableView.getColumns().add(interruptColumn);
             oTableView.getColumns().add(softInterruptColumn);
             oTableView.getColumns().add(stealColumn);
-            
-            oTableView.setItems(Collection);
+
+            oTableView.setItems(oCollection);
         }
-        
+
         return oTableView;
     }
 }

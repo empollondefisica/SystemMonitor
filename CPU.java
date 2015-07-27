@@ -8,43 +8,43 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 public class CPU
 {
-    SimpleStringProperty  Name           = null;
-    SimpleLongProperty    User           = null;
-    SimpleLongProperty    Nice           = null;
-    SimpleLongProperty    System         = null;
-    SimpleLongProperty    Idle           = null;
-    SimpleLongProperty    IOWait         = null;
-    SimpleLongProperty    Interrupts     = null;
-    SimpleLongProperty    SoftInterrupts = null;
-    SimpleLongProperty    Steal          = null;
-    SimpleBooleanProperty Modified       = null;
+    SimpleStringProperty  oName           = null;
+    SimpleLongProperty    oUser           = null;
+    SimpleLongProperty    oNice           = null;
+    SimpleLongProperty    oSystem         = null;
+    SimpleLongProperty    oIdle           = null;
+    SimpleLongProperty    oIOWait         = null;
+    SimpleLongProperty    oInterrupts     = null;
+    SimpleLongProperty    oSoftInterrupts = null;
+    SimpleLongProperty    oSteal          = null;
+    SimpleBooleanProperty oModified       = null;
 
     public CPU()
     {
-        Name            = new SimpleStringProperty();
-        User            = new SimpleLongProperty();
-        Nice            = new SimpleLongProperty();
-        System          = new SimpleLongProperty();
-        Idle            = new SimpleLongProperty();
-        IOWait          = new SimpleLongProperty();
-        Interrupts      = new SimpleLongProperty();
-        SoftInterrupts  = new SimpleLongProperty();
-        Steal           = new SimpleLongProperty();
-        Modified        = new SimpleBooleanProperty();
+        oName            = new SimpleStringProperty();
+        oUser            = new SimpleLongProperty();
+        oNice            = new SimpleLongProperty();
+        oSystem          = new SimpleLongProperty();
+        oIdle            = new SimpleLongProperty();
+        oIOWait          = new SimpleLongProperty();
+        oInterrupts      = new SimpleLongProperty();
+        oSoftInterrupts  = new SimpleLongProperty();
+        oSteal           = new SimpleLongProperty();
+        oModified        = new SimpleBooleanProperty();
     }
 
     public void update(CPU cpu)
     {
-        Name.setValue(cpu.getName());
-        User.setValue(cpu.getUser());
-        Nice.setValue(cpu.getNice());
-        System.setValue(cpu.getSystem());
-        Idle.setValue(cpu.getIdle());
-        IOWait.setValue(cpu.getIOWait());
-        Interrupts.setValue(cpu.getInterrupts());
-        SoftInterrupts.setValue(cpu.getSoftInterrupts());
-        Steal.setValue(cpu.getSteal());
-        Modified.setValue(true);
+        oName.setValue(cpu.getName());
+        oUser.setValue(cpu.getUser());
+        oNice.setValue(cpu.getNice());
+        oSystem.setValue(cpu.getSystem());
+        oIdle.setValue(cpu.getIdle());
+        oIOWait.setValue(cpu.getIOWait());
+        oInterrupts.setValue(cpu.getInterrupts());
+        oSoftInterrupts.setValue(cpu.getSoftInterrupts());
+        oSteal.setValue(cpu.getSteal());
+        oModified.setValue(true);
     }
 
     public void update(
@@ -58,63 +58,63 @@ public class CPU
         long softinterrupts,
         long steal)
     {
-        Name.setValue(name);
-        User.setValue(user);
-        Nice.setValue(nice);
-        System.setValue(system);
-        Idle.setValue(idle);
-        IOWait.setValue(iowait);
-        Interrupts.setValue(interrupts);
-        SoftInterrupts.setValue(softinterrupts);
-        Steal.setValue(steal);
-        Modified.setValue(true);
+        oName.setValue(name);
+        oUser.setValue(user);
+        oNice.setValue(nice);
+        oSystem.setValue(system);
+        oIdle.setValue(idle);
+        oIOWait.setValue(iowait);
+        oInterrupts.setValue(interrupts);
+        oSoftInterrupts.setValue(softinterrupts);
+        oSteal.setValue(steal);
+        oModified.setValue(true);
     }
 
 
-    public String getName() { return Name.getValue(); }
+    public String getName() { return oName.getValue(); }
 
-    public Long getUser() { return User.getValue(); }
+    public Long getUser() { return oUser.getValue(); }
 
-    public Long getNice() { return Nice.getValue(); }
+    public Long getNice() { return oNice.getValue(); }
 
-    public Long getSystem() { return System.getValue(); }
+    public Long getSystem() { return oSystem.getValue(); }
 
-    public Long getIdle() { return Idle.getValue(); }
+    public Long getIdle() { return oIdle.getValue(); }
 
-    public Long getIOWait() { return IOWait.getValue(); }
+    public Long getIOWait() { return oIOWait.getValue(); }
 
-    public Long getInterrupts() { return Interrupts.getValue(); }
+    public Long getInterrupts() { return oInterrupts.getValue(); }
 
-    public Long getSoftInterrupts() { return SoftInterrupts.getValue(); }
+    public Long getSoftInterrupts() { return oSoftInterrupts.getValue(); }
 
-    public Long getSteal() { return Steal.getValue(); }
+    public Long getSteal() { return oSteal.getValue(); }
 
-    public boolean getModified() { return Modified.getValue(); }
+    public boolean getModified() { return oModified.getValue(); }
 
     public Long getWork() { return getUser() + getSystem(); }
 
     public Long getTotal() { return getUser() + getSystem() + getNice() + getIdle() + getIOWait() + getInterrupts() + getSoftInterrupts() + getSteal(); }
 
 
-    public void setName(String name) { Name.setValue(name); }
+    public void setName(String name) { oName.setValue(name); }
 
-    public void setUser(long user) { User.setValue(user); }
+    public void setUser(long user) { oUser.setValue(user); }
 
-    public void setNice(long nice) { Nice.setValue(nice); }
+    public void setNice(long nice) { oNice.setValue(nice); }
 
-    public void setSystem(long system) { System.setValue(system); }
+    public void setSystem(long system) { oSystem.setValue(system); }
 
-    public void setIdle(long idle) { Idle.setValue(idle); }
+    public void setIdle(long idle) { oIdle.setValue(idle); }
 
-    public void setIOWait(long iowait) { IOWait.setValue(iowait); }
+    public void setIOWait(long iowait) { oIOWait.setValue(iowait); }
 
-    public void setInterrupts(long interrupts) { Interrupts.setValue(interrupts); }
+    public void setInterrupts(long interrupts) { oInterrupts.setValue(interrupts); }
 
-    public void setSoftInterrupts(long softinterrupts) { SoftInterrupts.setValue(softinterrupts); }
+    public void setSoftInterrupts(long softinterrupts) { oSoftInterrupts.setValue(softinterrupts); }
 
-    public void setSteal(long steal) { Steal.setValue(steal); }
+    public void setSteal(long steal) { oSteal.setValue(steal); }
 
-    public void setModified(boolean modified) { Modified.setValue(modified); }
+    public void setModified(boolean modified) { oModified.setValue(modified); }
 
 
     public boolean equals(Object object)
@@ -134,18 +134,23 @@ public class CPU
         }
     }
 
+    public int hashCode()
+    {
+        return oName.hashCode();
+    }
+
     public String toString()
     {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(Name.getValue() + " ");
-        strBuilder.append(User.getValue() + " ");
-        strBuilder.append(Nice.getValue() + " ");
-        strBuilder.append(System.getValue() + " ");
-        strBuilder.append(Idle.getValue() + " ");
-        strBuilder.append(IOWait.getValue() + " ");
-        strBuilder.append(Interrupts.getValue() + " ");
-        strBuilder.append(SoftInterrupts.getValue() + " ");
-        strBuilder.append(Steal.getValue());
+        strBuilder.append(oName.getValue() + " ");
+        strBuilder.append(oUser.getValue() + " ");
+        strBuilder.append(oNice.getValue() + " ");
+        strBuilder.append(oSystem.getValue() + " ");
+        strBuilder.append(oIdle.getValue() + " ");
+        strBuilder.append(oIOWait.getValue() + " ");
+        strBuilder.append(oInterrupts.getValue() + " ");
+        strBuilder.append(oSoftInterrupts.getValue() + " ");
+        strBuilder.append(oSteal.getValue());
 
         return strBuilder.toString();
     }
