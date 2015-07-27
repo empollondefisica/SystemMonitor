@@ -11,15 +11,13 @@ import java.nio.file.attribute.UserPrincipal;
 
 public class Test
 {
-    
-    
     public static void main( String[] args )
     {
         File file = new File( "/proc" );
         System.out.println( file.getAbsoluteFile() );
         File tempFile = null;
         File statusFile = null;
-        
+
         for( String name : file.list() )
         {
             if( name.matches( "^\\d+$" ) )
@@ -28,7 +26,7 @@ public class Test
                 System.out.println( tempFile.isDirectory() + " " + tempFile.getAbsoluteFile() );
                 statusFile = new File( tempFile.getAbsoluteFile() + "/status" );
                 System.out.println( statusFile.getAbsoluteFile() );
-                
+
                 try
                 {
                     Path path = Paths.get( statusFile.getAbsoluteFile().toString() );
@@ -45,11 +43,11 @@ public class Test
             }
         }
     }
-    
+
     public static String readProcFile( File procFile )
     {
         StringBuilder fileText = new StringBuilder();
-        
+
         try
         {
             InputStreamReader isr = new InputStreamReader( new FileInputStream( procFile ) );
@@ -66,7 +64,7 @@ public class Test
         {
             System.out.println( exception.getMessage() );
         }
-        
+
         return fileText.toString();
     }
 }
