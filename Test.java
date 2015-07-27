@@ -11,8 +11,11 @@ import java.nio.file.attribute.UserPrincipal;
 
 public class Test
 {
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 4940bfffc2e5b7a2906d0769826928f399281d75
     public static void main( String[] args )
     {
         File file = new File( "/proc" );
