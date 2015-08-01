@@ -48,14 +48,13 @@ import java.util.Map;
 
 public class SystemMonitor extends Application
 {
-<<<<<<< HEAD
     SystemProcesses      oUpdateSystemProcesses = null;
     SystemProcesses      oSystemProcesses       = null;
     CPUs                 oUpdateCPUs            = null;
     CPUs                 oCPUs                  = null;
     File                 oFile                  = null;
     SimpleStringProperty oInterval              = null;
-=======
+
     SystemProcesses updateSystemProcesses = null;
     SystemProcesses systemProcesses = null;
     CPUs updateCpus = null;
@@ -65,7 +64,6 @@ public class SystemMonitor extends Application
     HashMap<String, CPU> prevCPUMap;
 
     SimpleStringProperty interval = null;
->>>>>>> 4940bfffc2e5b7a2906d0769826928f399281d75
 
     public static void main(String[] args)
     {
@@ -141,16 +139,8 @@ public class SystemMonitor extends Application
         yAxis.setUpperBound(100.0);
         yAxis.setMinorTickVisible(false);
 
-        /*
-        userSeries.setName("User");
-        systemSeries.setName("System");
-        totalSeries.setName("Total");
-
-        lineChart.getData().add(userSeries);
-        lineChart.getData().add(systemSeries);
-        lineChart.getData().add(totalSeries);
-        */
         lineChart.setAnimated(false);
+        lineChart.setCreateSymbols(false);
 
         splitPane.getItems().add(tabPane);
         splitPane.getItems().add(lineChart);
@@ -183,58 +173,43 @@ public class SystemMonitor extends Application
                 updateProcessList();
                 updateCPUList();
 
-<<<<<<< HEAD
-                currCPU = oCPUs.getCollection().get(0);
-=======
-                for(CPU currCPU : cpus.getCollection())
+                for(CPU currCPU : oCPUs.getCollection())
                 {
-                    if(prevCPUMap.get(currCPU.getName()) == null)
+                    if( !currCPU.getName().equalsIgnoreCase("cpu") )
                     {
-                        prevCPUMap.put(currCPU.getName(), new CPU());
+                        if(prevCPUMap.get(currCPU.getName()) == null)
+                        {
+                            prevCPUMap.put(currCPU.getName(), new CPU());
+                        }
+
+                        prevCPU = prevCPUMap.get(currCPU.getName());
+
+                        if(seriesMap.get(currCPU.getName()) == null)
+                        {
+                            XYChart.Series<Number, Number> tempSeries = new XYChart.Series<Number, Number>();
+                            tempSeries.setName(currCPU.getName());
+                            lineChart.getData().add(tempSeries);
+                            seriesMap.put(currCPU.getName(), tempSeries);
+                        }
+
+                        currWork = currCPU.getWork();
+                        prevWork = prevCPUMap.get(currCPU.getName()).getWork();
+                        currTotal = currCPU.getTotal();
+                        prevTotal = prevCPUMap.get(currCPU.getName()).getTotal();
+
+                        userPercent = (double)(currCPU.getUser() - prevCPU.getUser()) / (double)(currTotal - prevTotal) * 100.0;
+                        systemPercent = (double)(currCPU.getSystem() - prevCPU.getSystem()) / (double)(currTotal - prevTotal) * 100.0;
+                        totalPercent = (double)(currWork - prevWork) / (double)(currTotal - prevTotal) * 100.0;
+
+                        seriesMap.get(currCPU.getName()).getData().add(new XYChart.Data<Number, Number>(X, totalPercent));
+
+                        prevCPUMap.get(currCPU.getName()).update(currCPU);
                     }
-
-                    prevCPU = prevCPUMap.get(currCPU.getName());
-
-                    if(seriesMap.get(currCPU.getName()) == null)
-                    {
-                        XYChart.Series<Number, Number> tempSeries = new XYChart.Series<Number, Number>();
-                        tempSeries.setName(currCPU.getName());
-                        lineChart.getData().add(tempSeries);
-                        seriesMap.put(currCPU.getName(), tempSeries);
-                    }
-
-                    currWork = currCPU.getWork();
-                    prevWork = prevCPUMap.get(currCPU.getName()).getWork();
-                    currTotal = currCPU.getTotal();
-                    prevTotal = prevCPUMap.get(currCPU.getName()).getTotal();
-
-                    userPercent = (double)(currCPU.getUser() - prevCPU.getUser()) / (double)(currTotal - prevTotal) * 100.0;
-                    systemPercent = (double)(currCPU.getSystem() - prevCPU.getSystem()) / (double)(currTotal - prevTotal) * 100.0;
-                    totalPercent = (double)(currWork - prevWork) / (double)(currTotal - prevTotal) * 100.0;
-
-                    seriesMap.get(currCPU.getName()).getData().add(new XYChart.Data<Number, Number>(X, totalPercent));
-                    System.out.println(currCPU.getName() + " " + X + " " + totalPercent);
                 }
-                ++X;
 
-                /*currCPU = cpus.getCollection().get(0);
->>>>>>> 4940bfffc2e5b7a2906d0769826928f399281d75
-
-                currWork  = currCPU.getWork();
-                prevWork  = prevCPU.getWork();
-                currTotal = currCPU.getTotal();
-                prevTotal = prevCPU.getTotal();
-
-                userPercent   = (double)(currCPU.getUser() - prevCPU.getUser()) / (double)(currTotal - prevTotal) * 100.0;
-                systemPercent = (double)(currCPU.getSystem() - prevCPU.getSystem()) / (double)(currTotal - prevTotal) * 100.0;
-                totalPercent  = (double)(currWork - prevWork) / (double)(currTotal - prevTotal) * 100.0;
-
-                userSeries.getData().add(new XYChart.Data<Number, Number>(++X, userPercent));
-                systemSeries.getData().add(new XYChart.Data<Number, Number>(X, systemPercent));
-                totalSeries.getData().add(new XYChart.Data<Number, Number>(X, totalPercent));
-                */
                 xAxis.setLowerBound(X - 29);
                 xAxis.setUpperBound(X);
+                ++X;
 
                 for(Map.Entry<String, XYChart.Series<Number, Number>> entry : seriesMap.entrySet())
                 {
@@ -243,13 +218,6 @@ public class SystemMonitor extends Application
                         entry.getValue().getData().remove(0);
                     }
                 }
-
-                for(CPU cpu : cpus.getCollection())
-                {
-                    prevCPUMap.get(cpu.getName()).update(cpu);
-                }
-
-                //prevCPU.update(currCPU);
 
                 oCPUs.getTableView().getColumns().get(0).setVisible(false);
                 oCPUs.getTableView().getColumns().get(0).setVisible(true);
@@ -389,6 +357,7 @@ public class SystemMonitor extends Application
                     textFile   = readProcFile(statusFile);
                     path       = Paths.get(statusFile.getAbsoluteFile().toString());
                     owner      = Files.getOwner(path);
+                    
                     oUpdateSystemProcesses.add(textFile, owner.getName());
                 }
             }
