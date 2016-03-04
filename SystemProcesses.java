@@ -101,9 +101,9 @@ public class SystemProcesses
         String owner = "";
         long processor = 0;
 
-        String pid = fileText.substring(0, fileText.indexOf(' '));
-        name = fileText.substring(pid.length() + 2, fileText.indexOf(')'));
-        fileText = fileText.substring(pid.length() + name.length() + 4, fileText.length());
+        String pid      = fileText.substring(0, fileText.indexOf(' '));
+        name            = fileText.substring(pid.length() + 2, fileText.indexOf(") "));
+        fileText        = fileText.substring(pid.length() + name.length() + 4, fileText.length());
         String[] tokens = fileText.split("\\s+");
 
         if(tokens.length > 1)
