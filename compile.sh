@@ -5,9 +5,9 @@ then
     echo "iterating"
     for FILE in $@
     do
-        javac -d bin ${FILE}
+        javac -Xlint -d bin ${FILE}
     done
 else
     echo "globbing"
-    javac -d bin *.java
+    javac -Xlint -d bin *.java
 fi

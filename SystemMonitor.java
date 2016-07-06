@@ -1,50 +1,56 @@
 
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
+import javafx.geometry.Orientation;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.TabPane;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Menu;
-import javafx.geometry.Orientation;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.collections.ObservableList;
-import javafx.collections.FXCollections;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import javafx.scene.Group;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
 import javafx.util.Duration;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.NumberAxis;
 
 import java.io.File;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
-
+import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.attribute.UserPrincipal;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.regex.PatternSyntaxException;
 
 public class SystemMonitor extends Application
 {
@@ -55,11 +61,14 @@ public class SystemMonitor extends Application
     File                 oFile                  = null;
     SimpleStringProperty oInterval              = null;
 
-    SystemProcesses updateSystemProcesses = null;
-    SystemProcesses systemProcesses = null;
-    CPUs updateCpus = null;
-    CPUs cpus = null;
-    File file = null;
+    SystemProcesses      updateSystemProcesses  = null;
+    SystemProcesses      systemProcesses        = null;
+    CPUs                 updateCpus             = null;
+    CPUs                 cpus                   = null;
+    File                 file                   = null;
+
+    Timeline             timer                  = null;
+
     HashMap<String, XYChart.Series<Number, Number>> seriesMap;
     HashMap<String, CPU> prevCPUMap;
 
@@ -72,29 +81,29 @@ public class SystemMonitor extends Application
 
     public void init()
     {
-        seriesMap = new HashMap<String, XYChart.Series<Number, Number>>();
+        seriesMap  = new HashMap<String, XYChart.Series<Number, Number>>();
         prevCPUMap = new HashMap<String, CPU>();
     }
 
     public void start(Stage stage)
     {
-        oFile                  = new File("/proc");
-        oUpdateSystemProcesses = new SystemProcesses();
-        oSystemProcesses       = new SystemProcesses();
-        oUpdateCPUs            = new CPUs();
-        oCPUs                  = new CPUs();
-        oInterval              = new SimpleStringProperty();
+        oFile                   = new File("/proc");
+        oUpdateSystemProcesses  = new SystemProcesses();
+        oSystemProcesses        = new SystemProcesses();
+        oUpdateCPUs             = new CPUs();
+        oCPUs                   = new CPUs();
+        oInterval               = new SimpleStringProperty();
 
-        updateCPUList();
-        updateProcessList();
-
-        oInterval.setValue("" + oSystemProcesses.count());
-
-        Group      group      = new Group();
-        Scene      scene      = new Scene(group, 640, 800);
-        BorderPane borderPane = new BorderPane();
-        SplitPane  splitPane  = new SplitPane();
-        TabPane    tabPane    = new TabPane();
+        Group      group        = new Group();
+        Scene      scene        = new Scene(group, 640, 800);
+        BorderPane borderPane   = new BorderPane();
+        SplitPane  splitPane    = new SplitPane();
+        TabPane    tabPane      = new TabPane();
+        VBox       vbox         = new VBox();
+        MenuBar    menuBar      = new MenuBar();
+        Menu       menu         = new Menu("Menu");
+        Menu       procCount    = new Menu();
+        MenuItem   exitMenuItem = new MenuItem("Exit");
 
         NumberAxis                     xAxis        = new NumberAxis();
         NumberAxis                     yAxis        = new NumberAxis();
@@ -103,10 +112,10 @@ public class SystemMonitor extends Application
         XYChart.Series<Number, Number> systemSeries = new XYChart.Series<Number, Number>();
         XYChart.Series<Number, Number> totalSeries  = new XYChart.Series<Number, Number>();
 
-        MenuBar  menuBar      = new MenuBar();
-        Menu     menu         = new Menu("Menu");
-        Menu     procCount    = new Menu();
-        MenuItem exitMenuItem = new MenuItem("Exit");
+        updateCPUList();
+        updateProcessList();
+
+        oInterval.setValue("" + oSystemProcesses.count());
 
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -154,14 +163,14 @@ public class SystemMonitor extends Application
 
         group.getChildren().add(borderPane);
 
-        Timeline timer = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>()
+        timer = new Timeline(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>()
         {
-            CPU prevCPU = new CPU();
-            CPU currCPU = null;
-            int X = 0;
-            double userPercent = 0.0;
+            CPU prevCPU          = new CPU();
+            CPU currCPU          = null;
+            int X                = 0;
+            double userPercent   = 0.0;
             double systemPercent = 0.0;
-            double totalPercent = 0.0;
+            double totalPercent  = 0.0;
 
             Long currWork;
             Long currTotal;
@@ -256,10 +265,57 @@ public class SystemMonitor extends Application
 
     private Tab buildProcessTab()
     {
-        Tab                      processTab = new Tab("Processes");
-        TableView<SystemProcess> tableView  = oSystemProcesses.getTableView();
+        Tab              processTab = new Tab("Processes");
+        VBox             vbox       = new VBox();
+        ComboBox<String> comboBox   = new ComboBox<String>();
+        ProcessTableView tableView  = oSystemProcesses.getTableView();
 
-        processTab.setContent(tableView);
+        comboBox.setItems(getOwners());
+
+        comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>()
+        {
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue)
+            {
+                oSystemProcesses.getFilteredList().setPredicate(new Predicate<SystemProcess>()
+                {
+                    public boolean test(SystemProcess pSystemProcess)
+                    {
+                        if(newValue == null || newValue.isEmpty())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            String filterText = newValue.toLowerCase();
+                            try
+                            {
+                                if(newValue.equals(""))
+                                {
+                                    return false;
+                                }
+                                else if(pSystemProcess.getOwner().toLowerCase().equals(newValue))
+                                {
+                                    return true;
+                                }
+                            }
+                            catch(PatternSyntaxException pPatternSyntaxException)
+                            {
+                                return false;
+                            }
+
+                            return false;
+                        }
+                    }
+                });
+            }
+        });
+        
+        TableColumn<SystemProcess, String> owners = tableView.getOwnerColumn();
+
+        vbox.getChildren().add(comboBox);
+        vbox.getChildren().add(tableView);
+
+        processTab.setContent(vbox);
 
         return processTab;
     }
@@ -445,4 +501,35 @@ public class SystemMonitor extends Application
 
         return fileText.toString();
     }
+    
+    private ObservableList<String> getOwners()
+    {
+        ObservableList<String> owners = FXCollections.observableArrayList();
+        String[] tokens;
+        String line;
+
+        try
+        {
+            owners.add("");
+
+            BufferedReader br = new BufferedReader(new FileReader(new File("/etc/passwd")));
+            while(br.ready())
+            {
+                line = br.readLine();
+                tokens = line.split(":");
+                if( tokens.length > 0 )
+                {
+                    owners.add(tokens[0]);
+                }
+            }
+        }
+        catch(IOException exception)
+        {
+            System.out.println(exception.getMessage());
+        }
+
+        return owners;
+    }
 }
+
+

@@ -1,23 +1,30 @@
 
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 
 public class SystemProcesses
 {
-    ObservableList<SystemProcess> Collection = null;
-    TableView<SystemProcess> oTableView = null;
+    ObservableList<SystemProcess> cCollection = null;
+    FilteredList<SystemProcess> cFilteredList = null;
+    SortedList<SystemProcess> cSortedList = null;
+    ProcessTableView cProcessTableView = null;
 
     public SystemProcesses()
     {
-        Collection = FXCollections.observableArrayList();
+        cCollection = FXCollections.observableArrayList();
+        cFilteredList = new FilteredList<SystemProcess>( cCollection, p -> true );
+        cSortedList = new SortedList<SystemProcess>( cFilteredList );
+        cProcessTableView = new ProcessTableView(this);
+
+        cSortedList.comparatorProperty().bind(cProcessTableView.comparatorProperty());
+        cProcessTableView.setItems(cSortedList);
     }
 
     public void add(SystemProcess process)
     {
-        Collection.add(process);
+        cCollection.add(process);
     }
 
     public void add(
@@ -72,7 +79,7 @@ public class SystemProcesses
         process.setOwner(owner);
         process.setModified(true);
 
-        Collection.add(process);
+        cCollection.add(process);
     }
 
     public void add(String fileText, String ownerName)
@@ -159,115 +166,46 @@ public class SystemProcesses
 
     public void clear()
     {
-        Collection.clear();
+        cCollection.clear();
     }
 
     public int count()
     {
-        return Collection.size();
+        return cCollection.size();
     }
 
     public ObservableList<SystemProcess> getCollection()
     {
-        return Collection;
+        return cCollection;
     }
 
     public void remove(Process process)
     {
-        Collection.remove(process);
+        cCollection.remove(process);
     }
 
     public void remove(int index)
     {
-        Collection.remove(index);
+        cCollection.remove(index);
     }
 
     public int find(SystemProcess process)
     {
-        return Collection.indexOf(process);
+        return cCollection.indexOf(process);
     }
 
-    public TableView<SystemProcess> getTableView()
+    public SortedList<SystemProcess> getSortedList()
     {
-        if(oTableView == null)
-        {
-            oTableView = new TableView<SystemProcess>();
+        return cSortedList;
+    }
 
-            TableColumn<SystemProcess, Long> pidColumn        = new TableColumn<SystemProcess, Long>("PID");
-            TableColumn<SystemProcess, String> nameColumn     = new TableColumn<SystemProcess, String>("Name");
-            TableColumn<SystemProcess, String> stateColumn    = new TableColumn<SystemProcess, String>("State");
-            TableColumn<SystemProcess, Long> ppidColumn       = new TableColumn<SystemProcess, Long>("PPID");
-            TableColumn<SystemProcess, Long> pgidColumn       = new TableColumn<SystemProcess, Long>("PGID");
-            TableColumn<SystemProcess, Long> sessionID        = new TableColumn<SystemProcess, Long>("Session");
-            TableColumn<SystemProcess, Long> tgidColumn       = new TableColumn<SystemProcess, Long>("TGID");
-            TableColumn<SystemProcess, Long> minFaultsColumn  = new TableColumn<SystemProcess, Long>("Minor Faults");
-            TableColumn<SystemProcess, Long> cMinFaultsColumn = new TableColumn<SystemProcess, Long>("Child Minor Faults");
-            TableColumn<SystemProcess, Long> majFaultsColumn  = new TableColumn<SystemProcess, Long>("Major Faults");
-            TableColumn<SystemProcess, Long> cMajFaultsColumn = new TableColumn<SystemProcess, Long>("Child Major Faults");
-            TableColumn<SystemProcess, Long> utimeColumn      = new TableColumn<SystemProcess, Long>("User Time");
-            TableColumn<SystemProcess, Long> stimeColumn      = new TableColumn<SystemProcess, Long>("System Time");
-            TableColumn<SystemProcess, Long> cutimeColumn     = new TableColumn<SystemProcess, Long>("Child User Time");
-            TableColumn<SystemProcess, Long> cstimeColumn     = new TableColumn<SystemProcess, Long>("Child System Time");
-            TableColumn<SystemProcess, Long> priorityColumn   = new TableColumn<SystemProcess, Long>("Priority");
-            TableColumn<SystemProcess, Long> niceColumn       = new TableColumn<SystemProcess, Long>("Nice Value");
-            TableColumn<SystemProcess, Long> threadColumn     = new TableColumn<SystemProcess, Long>("Num Threads");
-            TableColumn<SystemProcess, Long> startColumn      = new TableColumn<SystemProcess, Long>("Start Time");
-            TableColumn<SystemProcess, Long> vsizeColumn      = new TableColumn<SystemProcess, Long>("Virtual Size");
-            TableColumn<SystemProcess, Long> rssColumn        = new TableColumn<SystemProcess, Long>("Resident Set Size");
-            TableColumn<SystemProcess, Long> processorColumn  = new TableColumn<SystemProcess, Long>("Processor Number");
-            TableColumn<SystemProcess, String> ownerColumn    = new TableColumn<SystemProcess, String>("Owner");
+    public FilteredList<SystemProcess> getFilteredList()
+    {
+        return cFilteredList;
+    }
 
-            pidColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ProcessID"));
-            nameColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("Name"));
-            stateColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("State"));
-            ppidColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ParentPID"));
-            pgidColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ProcessGroupID"));
-            sessionID.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("SessionID"));
-            tgidColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ThreadGroupID"));
-            minFaultsColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("MinorFaults"));
-            cMinFaultsColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ChildMinorFaults"));
-            majFaultsColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("MajorFaults"));
-            cMajFaultsColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ChildMajorFaults"));
-            utimeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("UserTime"));
-            stimeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("SystemTime"));
-            cutimeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ChildUserTime"));
-            cstimeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ChildSystemTime"));
-            priorityColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("Priority"));
-            niceColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("NiceValue"));
-            threadColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("NumThreads"));
-            startColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("StartTime"));
-            vsizeColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("VirtualSize"));
-            rssColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ResidentSetSize"));
-            processorColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, Long>("ProcessorNumber"));
-            ownerColumn.setCellValueFactory(new PropertyValueFactory<SystemProcess, String>("Owner"));
-
-            oTableView.getColumns().add(pidColumn);
-            oTableView.getColumns().add(nameColumn);
-            oTableView.getColumns().add(stateColumn);
-            oTableView.getColumns().add(ppidColumn);
-            oTableView.getColumns().add(pgidColumn);
-            oTableView.getColumns().add(sessionID);
-            oTableView.getColumns().add(tgidColumn);
-            oTableView.getColumns().add(minFaultsColumn);
-            oTableView.getColumns().add(cMinFaultsColumn);
-            oTableView.getColumns().add(majFaultsColumn);
-            oTableView.getColumns().add(cMajFaultsColumn);
-            oTableView.getColumns().add(utimeColumn);
-            oTableView.getColumns().add(stimeColumn);
-            oTableView.getColumns().add(cutimeColumn);
-            oTableView.getColumns().add(cstimeColumn);
-            oTableView.getColumns().add(priorityColumn);
-            oTableView.getColumns().add(niceColumn);
-            oTableView.getColumns().add(threadColumn);
-            oTableView.getColumns().add(startColumn);
-            oTableView.getColumns().add(vsizeColumn);
-            oTableView.getColumns().add(rssColumn);
-            oTableView.getColumns().add(processorColumn);
-            oTableView.getColumns().add(ownerColumn);
-
-            oTableView.setItems(Collection);
-        }
-
-        return oTableView;
+    public ProcessTableView getTableView()
+    {
+        return cProcessTableView;
     }
 }
